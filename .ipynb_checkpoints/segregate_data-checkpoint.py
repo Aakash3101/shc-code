@@ -1,23 +1,28 @@
 import os
-from datetime import datetime
 import json
 import pandas as pd
 from pprint import pprint
 from tqdm.auto import tqdm
+from datetime import datetime
 
-states = os.listdir("./states")
-output_dir = "./data/"
+DATA_DIR = "./shc_data"
+KML_DIR = "KML_files/states"
+states = os.listdir(os.path.join(DATA_DIR, "KML_files/states"))
+OUTPUT_DIR = "YEAR_WISE_DATA"
+
+os.makedirs(os.path.join(DATA_DIR, OUTPUT_DIR), exist_ok=True)
+
+years = ['2023', '2024']
 
 for state in states:
-    rows_2023_24 = []
-    rows_2024_25 = []
-    districts = os.listdir(f"./states/{state}")
+    rows = {key: [] for key in years}
+    
+    districts = os.listdir(os.path.join(DATA_DIR,f"{KML_DIR}/{state}"))
     for district in districts:
         if district == "getDistricts.json":
             continue
 
-        # print(f"District : {district}")
-        json_path = f"./states/{state}/{district}/features.json"
+        json_path = os.path.join(DATA_DIR, f"{KML_DIR}/{state}/{district}/features.json")
         if not os.path.exists(json_path):
             continue
 
@@ -32,12 +37,14 @@ for state in states:
             if feature["period"] in ["2023-24", "2024-25"]:
 
                 if "date" not in feature["properties"].keys():
+                    # print("No date found in the feature")
                     continue
 
-                # dt = feature["properties"]["date"]
-                # dt = datetime.strptime(dt, "%m/%d/%y, %I:%M %p")
-                # year = dt.year
-
+                dt = feature["properties"]["date"]
+                dt = datetime.strptime(dt, "%m/%d/%y, %I:%M %p")
+                year = dt.year
+                # print(year, dt)
+                
                 # district, village, date, lat, long, [N, P, K, B, Fe, Zn, Cu, S, OC, pH, Mn, EC]
                 try:
                     row = {
@@ -62,25 +69,18 @@ for state in states:
                 except KeyError:
                     pprint(feature["properties"])
 
-                if feature["period"] == "2023-24":
-                    rows_2023_24.append(row)
-                else:
-                    rows_2024_25.append(row)
+                if str(year) in years:
+                    rows[str(year)].append(row)
 
-    df1 = pd.DataFrame(rows_2023_24)
-    df2 = pd.DataFrame(rows_2024_25)
-
-    df1.to_csv(
-        os.path.join(os.path.join(output_dir, "2023-24"), f"{state}_2023_24.csv"),
-        index=False,
-        encoding="utf-8",
-    )
-    print(f"Saved {state}_2023_24.csv with {len(df1)} records")
-    df2.to_csv(
-        os.path.join(os.path.join(output_dir, "2024-25"), f"{state}_2024_25.csv"),
-        index=False,
-        encoding="utf-8",
-    )
-    print(f"Saved {state}_2024_25.csv with {len(df2)} records")
+    for year in years:
+        df = pd.DataFrame(rows[year])
+        SAVE_DIR = os.path.join(DATA_DIR, OUTPUT_DIR, year)
+        os.makedirs(SAVE_DIR, exist_ok=True)
+        df.to_csv(
+            os.path.join(SAVE_DIR, f"{state}_{year}.csv"),
+            index=False,
+            encoding="utf-8",
+        )
+        print(f"Saved {state}_{year}.csv with {len(df)} records")
 
 print("All states completed")
