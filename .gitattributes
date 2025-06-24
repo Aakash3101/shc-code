@@ -1,2 +1,4 @@
 AEZs/*.csv filter=lfs diff=lfs merge=lfs -text
 shc_data/*.csv filter=lfs diff=lfs merge=lfs -text
+shc_data/AEZS/*/*.csv filter=lfs diff=lfs merge=lfs -text
+shc_data/SATELLITE_DATA/2024/COMBINED_2024.csv filter=lfs diff=lfs merge=lfs -text

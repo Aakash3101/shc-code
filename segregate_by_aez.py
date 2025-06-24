@@ -5,7 +5,7 @@ import geopandas as gpd
 from shapely.geometry import Point
 
 # Load AEZ GeoJSON file
-aez_gdf = gpd.read_file("../WRIS/Agro Ecological Regions.geojson")
+aez_gdf = gpd.read_file("Agro Ecological Regions.geojson")
 
 # Ensure AEZ data is in the correct coordinate reference system (CRS)
 aez_gdf = aez_gdf.to_crs(epsg=4326)  # Convert to WGS84 if not already

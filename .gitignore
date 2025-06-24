@@ -1,2 +1,7 @@
 shc_data/KML_files/
+# Ignore Python virtual environments
 venv/
+*.pyc
+__pycache__/
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
