@@ -6,6 +6,10 @@ from itertools import chain
 from get_layer_info import get_layer_info
 from fetch_features import fetch_kml, parse_kml
 
+DATA_DIR = "./shc_data"
+SUB_DIR = "KML_FILES"
+ROOT_DATA_PATH = os.path.join(DATA_DIR, SUB_DIR)
+os.makedirs(ROOT_DATA_PATH, exist_ok=True)
 
 def get_states_json():
     """
@@ -24,7 +28,7 @@ def get_states_json():
         data = response.json()
 
         # Save the JSON to a file
-        with open("getStates.json", "w") as file:
+        with open(os.path.join(ROOT_DATA_PATH, "getStates.json"), "w") as file:
             json.dump(data, file, indent=4)
 
         print("Response saved to getStates.json")
@@ -53,9 +57,7 @@ def get_districts_by_state_json(state_hash, state_name):
         # Parse the JSON response
         data = response.json()
 
-        file_path = os.path.join(
-            os.path.join("states", state_name), "getDistricts.json"
-        )
+        file_path = os.path.join(ROOT_DATA_PATH, "states", state_name, "getDistricts.json")
 
         # Save the JSON to a file
         with open(file_path, "w") as file:
@@ -76,16 +78,18 @@ def getMetaFiles(st, dt=None):
         st (str): The name of the state to fetch data for. If None, fetches for all states.
         dt (str, optional): The name of the district to fetch data for. If None, fetches for all districts.
     """
-
+    STATES_PATH = os.path.join(ROOT_DATA_PATH, "states")
+    os.makedirs(STATES_PATH, exist_ok=True)
+    
     # check if getStates.json already exists in directory or not
-    if os.path.exists("getStates.json"):
+    if os.path.exists(os.path.join(ROOT_DATA_PATH, "getStates.json")):
         print("\ngetStates.json already exists")
     else:
         # if not then call get_states_json() to get the json data
         get_states_json()
 
     # if exists then load the json data
-    states = json.load(open("getStates.json"))
+    states = json.load(open(os.path.join(ROOT_DATA_PATH, "getStates.json")))
 
     states_dict = {}
 
@@ -94,31 +98,21 @@ def getMetaFiles(st, dt=None):
 
     for key, values in tqdm(states_dict.items(), leave=True, position=0):
         if st is None or key == st:
-            os.makedirs(os.path.join("states", key), exist_ok=True)
+            os.makedirs(os.path.join(STATES_PATH, key), exist_ok=True)
             state_name = key
             state_hash, state_code = values[1], values[0]
             print(f"\nGetting districts for {state_name.upper()}")
-
-            if os.path.exists(
-                os.path.join(
-                    os.path.join("states", state_name.upper()), "getDistricts.json"
-                )
-            ):
+            district_file_path = os.path.join(STATES_PATH, state_name.upper(), "getDistricts.json")
+            if os.path.exists(district_file_path):
                 print(
-                    f'\n{os.path.join(os.path.join("states", state_name.upper()), "getDistricts.json")} already exists'
+                    f'\n{district_file_path} already exists'
                 )
             else:
                 get_districts_by_state_json(state_hash, state_name.upper())
 
             # save the districts json data to a file
 
-            districts = json.load(
-                open(
-                    os.path.join(
-                        os.path.join("states", state_name.upper()), "getDistricts.json"
-                    )
-                )
-            )
+            districts = json.load(open(district_file_path))
 
             districts_dict = {}
 
@@ -134,7 +128,7 @@ def getMetaFiles(st, dt=None):
                     print(f"Getting KML for {district.upper()}\n\n")
                     # print(f"{state_code, districts_dict[district]}")
 
-                    path = os.path.join(os.path.join("states", state_name), district)
+                    path = os.path.join(STATES_PATH, state_name, district)
                     os.makedirs(path, exist_ok=True)
 
                     layer_file_path = os.path.join(path, "getLayers.json")
