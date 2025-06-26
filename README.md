@@ -99,8 +99,8 @@ shc-code/
 |   |   ├── P
 │   │   ├── K
 |   |   └── OC
-│   ├── 2024
-│   └── AGRI_2023-24
+│   ├── AEZ_19
+│   └── AEZ_20
 ├── utils/
 │   ├── fetch_features.py
 │   ├── get_feature_info.py
