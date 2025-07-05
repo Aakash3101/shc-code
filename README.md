@@ -28,6 +28,30 @@ source venv/bin/activate  # For Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+### 4. Install Git LFS
+
+#### On Linux
+
+Debian and RPM packages are available from packagecloud, see the [Linux installation instructions](INSTALLING.md).
+
+#### On macOS
+
+[Homebrew](https://brew.sh) bottles are distributed and can be installed via `brew install git-lfs`.
+
+#### On Windows
+
+Git LFS is included in the distribution of [Git for Windows](https://gitforwindows.org/).
+Alternatively, you can install a recent version of Git LFS from the [Chocolatey](https://chocolatey.org/) package manager.
+
+In the root directory of the git repo
+
+```bash
+git lfs install
+git lfs pull
+```
+
+This will fetch the already cleaned and extracted data.
+
 ---
 
 ## 📥 Downloading Data
